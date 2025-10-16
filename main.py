@@ -1,10 +1,15 @@
-from flask import Flask, send_from_directory
+from http.server import SimpleHTTPRequestHandler, HTTPServer
 
-app = Flask(__name__)
+class Handler(SimpleHTTPRequestHandler):
+    def end_headers(self):
+        self.send_header('Access-Control-Allow-Origin', '*')
+        super().end_headers()
 
-@app.route('/data.csv')
-def get_csv():
-    return send_from_directory('.', 'data.csv')
+def run(server_class=HTTPServer, handler_class=Handler, port=8000):
+    server_address = ('', port)
+    httpd = server_class(server_address, handler_class)
+    print(f'Serving on port {port}')
+    httpd.serve_forever()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    run()
